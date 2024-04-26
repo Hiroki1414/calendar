@@ -1,0 +1,9 @@
+.fc .fc-button {
+    color: white !important; /* テキストの色 */
+    background-color: #006FCE !important; /* 暗い青の背景色 */
+    border-color: #006FCE !important; /* 暗い青の境界線の色 */
+}
+.fc .fc-button:hover {
+    background-color: #0056b3 !important; /* ホバー時のさらに暗い青 */
+    border-color: #0056b3 !important; /* ホバー時のさらに暗い青の境界線色 */
+}

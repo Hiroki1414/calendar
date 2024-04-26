@@ -15,6 +15,7 @@ class Model_Calendar extends \Orm\Model
         'color',
         'created_at',
         'modified_at',
+        'user_id',
     );
 
     /**

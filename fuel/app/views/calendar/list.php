@@ -7,6 +7,6 @@
 </head>
 <body>
     <div id="app"></div> 
-    <script type="module" src="/assets/js/main.<hash>.js"></script> 
+    <?php echo Asset::js('main.js'); ?>
 </body>
 </html>

@@ -2,111 +2,168 @@
 <html lang="ja" class="h-100">
 <head>
     <?php echo Asset::css('bootstrap.min.css'); ?>
+    <?php echo Asset::css('style.css'); ?>
+    <?php
+    $colorsConfig = include(APPPATH . 'config/calendar/config.php');
+    $colors = $colorsConfig['colors'];
+    ?>
     <title><?php echo htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?></title>
     <title><?php echo $title; ?></title>
     <script src="https://knockoutjs.com/downloads/knockout-3.5.1.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
-<body class="d-flex flex-column h-100">
+<body class="d-flex flex-column vh-100">
 
-<div id='calendar'></div>
+<div id="calendar" class="flex-grow-1"></div>
 
-<select data-bind="options: availableColors, optionsText: 'name', value: selectedColor, optionsCaption: '色を選択...'"></select>
-
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="eventTitle">Title</label>
+            <input type="text" class="form-control" id="eventTitle" data-bind="value: eventTitle">
+          </div>
+          <div class="form-group">
+            <label for="eventStart">Start</label>
+            <input type="datetime-local" class="form-control" id="eventStart" data-bind="value: eventStart">
+          </div>
+          <div class="form-group">
+            <label for="eventEnd">End</label>
+            <input type="datetime-local" class="form-control" id="eventEnd" data-bind="value: eventEnd">
+          </div>
+          <div class="form-group">
+            <label for="colorSelection">Color</label>
+            <select class="form-control" id="colorSelection" data-bind="options: availableColors, optionsText: 'name', optionsValue: 'key', value: selectedColor"></select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bind="click: saveEvent">Save</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        function AppViewModel() {
-            this.selectedDate = ko.observable();
-            this.availableColors = ko.observableArray([
-                { name: '赤', class: 'bg-danger' },
-                { name: 'オレンジ', class: 'bg-warning' },
-                { name: '青', class: 'bg-primary' },
-                { name: '水色', class: 'bg-info' },
-                { name: '緑', class: 'bg-success' },
-                { name: '黒', class: 'bg-dark' },
-                { name: 'グレー', class: 'bg-secondary' }
-            ]);
-            this.selectedColor = ko.observable(); // 選択された色
-        }
-    
-        // ViewModelをインスタンス化し、Knockout.jsに適用
-        var viewModel = new AppViewModel();
-        ko.applyBindings(viewModel);
-        
         var calendarEl = document.getElementById('calendar');
+        var colorsArray = <?php echo json_encode($colors); ?>;
+        var getColorCode = function(colorName) {
+        return colorsArray[colorName] ? colorsArray[colorName].color : '#333333';
+        };
         var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            events: <?php echo json_encode($schedules); ?>,
+            customButtons: {
+              myCustomButton: {
+                  text: 'event',
+                  click: function() {
+                      location.href='list';
+                  }
+              }
+            },
+            headerToolbar: {
+                left: 'prev,next today myCustomButton',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            events: function(fetchInfo, successCallback, failureCallback) {
+                $.ajax({
+                    url: '/rest/calendar/list', 
+                    type: 'GET',
+                    contentType:"application/json; charset=utf-8",
+                    success: function(response) {
+                        if(response.status === 'success') {
+                            var events = response.data.map(function(event) {
+                                return {
+                                    title: event.title,
+                                    start: event.start,
+                                    end: event.end,
+                                    backgroundColor: getColorCode(event.color),
+                                    borderColor: getColorCode(event.color) 
+                                };
+                            });
+                            successCallback(events);
+                        } else {
+                            failureCallback();
+                            console.error('スケジュールの取得に失敗:', response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        failureCallback();
+                        console.error('スケジュールの取得中にエラーが発生しました:', xhr.responseText);
+                    }
+                });
+            },
+            navLinks: true,
+            businessHours: true,
             editable: true, // イベントを編集可能に設定
             selectable: true, // 日付の範囲選択を可能に設定
-
             dateClick: function(info) {
-                // イベントタイトルの入力
-                var title = prompt('イベントタイトルを入力してください:');
-                if (!title) {
-                    return;
-                }
+                viewModel.eventTitle(''); // タイトルをリセット
+                viewModel.eventStart(info.dateStr + 'T00:00'); // 開始時間をリセット
+                viewModel.eventEnd(info.dateStr + 'T00:00'); // 終了時間をリセット
+                viewModel.selectedDate(info.dateStr); // ViewModelに日付を更新
+                $('#eventModal').modal('show'); // モーダルを表示
+            },
+        });
+        calendar.render();
 
-                // 持続時間（日数）の入力
-                var days = prompt('イベントの持続日数を入力してください (1で終日):', '1');
-                if (!days || isNaN(days)) {
-                    return;
-                }
+        function AppViewModel() {
+            this.eventTitle = ko.observable();
+            this.eventStart = ko.observable();
+            this.eventEnd = ko.observable();
+            this.selectedColor = ko.observable(); 
+            this.selectedDate = ko.observable();
+            this.availableColors = ko.observableArray(Object.keys(colorsArray).map(function(key) {
+                return { key: key, name: colorsArray[key].name };
+            }));
 
-                // 終了日時の計算
-                var endDate = new Date(info.dateStr);
-                endDate.setDate(endDate.getDate() + parseInt(days));
-
-                // 色の指定
-                var colorClass = viewModel.selectedColor() ? viewModel.selectedColor().class : '';
-                if (!colorClass) {
-                    alert('色を選択してください。');
-                    return;
-                }
-
-                // カレンダーにイベントを追加
-                let eventData = {
-                    title: title,
-                    start: info.dateStr,
-                    end: endDate.toISOString().split('T')[0], // ISO形式の日付のみを使用
-                    colorName: colorClass,
+            // カレンダーにイベントを追加
+            this.saveEvent = function(){
+                var eventData = {
+                    title: this.eventTitle(),
+                    start: this.eventStart(),
+                    end: this.eventEnd(),
+                    color: this.selectedColor()
                 };
-                console.log(JSON.stringify(eventData));
-
-                // const events = [
-                //     {
-                //         id: 
-                //         start: 
-                //         end: 
-                //         title: 
-                //         Color: 
-                //         title:
-                //     }
-                // ];
-
-                calendar.addEvent(eventData);
+                console.log(eventData);
 
                 $.ajax({
                     url:'/rest/calendar/add',
                     type:'POST',
-                    contentType:"application/json",
-                    data:JSON.stringify(eventData),
-                    // dataType:'json',
-                }).done(function(data) {
-                    console.log(data)    
-                        alert("ok");
-                }).fail(function(XMLHttpRequest, textStatus, errorThrown) {
-                    console.log(JSON.stringify(eventData));
-                    console.log(textStatus);
-                    console.log(errorThrown);      
-                        alert("error");
-                })
-            } 
-        });
-        calendar.render();
+                    dataType: 'json',
+                    data: eventData,
+                    success: function(response) {
+                        alert(response.message);
+                        console.log(eventData);
+                        $('#eventModal').modal('hide');
+                        calendar.addEvent({
+                            title: eventData.title,
+                            start: eventData.start,
+                            end: eventData.end,
+                            backgroundColor: getColorCode(eventData.color),
+                            borderColor: getColorCode(eventData.color)
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        alert('エラーが発生しました: ' + xhr.responseText);
+                    }
+                }); 
+            };
+        };
+        // ViewModelをインスタンス化し、Knockout.jsに適用
+        var viewModel = new AppViewModel();
+        ko.applyBindings(viewModel);
     });
 </script>
-
+<?php echo Asset::js('bootstrap.min.js'); ?>
 </body>
 </html>
