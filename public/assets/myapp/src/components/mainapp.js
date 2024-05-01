@@ -9,13 +9,15 @@ function MainApp({ fetchEvents, handleUpdate, handleEdit, handleDelete }) {
   useEffect(() => {
     const fetchColors = async () => {
       try {
-        const response = await fetch('http://localhost:8888/rest/calendar/colors');
+        const response = await fetch('http://localhost:8888/rest/calendar/colors', {
+          credentials: 'include' // 認証情報を含む
+        });
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
         if (data.status === 'success') {
-          setColorOptions(data.data);  // data.data は色情報の配列
+          setColorOptions(data.data);  
         } else {
           console.error('Failed to fetch colors:', data);
         }
@@ -26,7 +28,7 @@ function MainApp({ fetchEvents, handleUpdate, handleEdit, handleDelete }) {
 
     fetchColors();
     fetchEvents(setEvents);
-  }, [fetchEvents]);
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -47,9 +49,14 @@ function MainApp({ fetchEvents, handleUpdate, handleEdit, handleDelete }) {
     return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
 
+  const handleBackToCalendar = () => {
+    window.location.href = 'http://localhost:8888/calendar/index';
+  };
+
   return (
     <div>
       <h1>Events</h1>
+      <button onClick={handleBackToCalendar} className="button button-back">Back to Calendar</button>
       {events.map(event => (
         <div key={event.schedule_id} className="card" style={{ borderColor: colorOptions[event.color]?.color }}>
           {editingEvent && editingEvent.schedule_id === event.schedule_id ? (

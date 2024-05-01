@@ -4,7 +4,10 @@ import MainApp from "./components/mainapp";
 function App() {
   const fetchEvents = async (setEvents) => {
     try {
-      const response = await fetch('http://localhost:8888/rest/calendar/list');
+      const response = await fetch('http://localhost:8888/rest/calendar/list', {
+        credentials: 'include', // クロスオリジンリクエストで認証情報を送信
+        redirect: 'manual'
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -17,6 +20,13 @@ function App() {
       }
     } catch (error) {
         console.error("Fetching events failed:", error);
+        if (error.message.includes('401')) {
+          if (!window.sessionAlert) {
+            window.sessionAlert = true;
+            alert("セッションが切れました。ログインページに戻ります。");
+            window.location.href = 'http://localhost:8888/auth/login/index';
+          }
+        }
     }
   };
 
@@ -38,6 +48,7 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(eventDetails),
       });
       if (!response.ok) throw new Error('Network response was not ok.');
@@ -58,6 +69,7 @@ function App() {
     try {
       const response = await fetch(`http://localhost:8888/rest/calendar/delete/${id}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
       if (!response.ok) throw new Error('Network response was not ok.');
       window.location.reload()

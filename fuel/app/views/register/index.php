@@ -98,7 +98,7 @@
             <div>
                 <button type="submit">登録</button>
             </div>
-            <a href="/login/index">ログインページに戻る</a>
+            <a href="/auth/login/index">ログインページに戻る</a>
         </form>
     </div>
 </body>

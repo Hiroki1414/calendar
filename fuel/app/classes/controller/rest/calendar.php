@@ -1,36 +1,52 @@
 <?php
 
-class Controller_Rest_Calendar extends \Controller_Rest
+namespace Controller\Rest;
+
+use Fuel\Core\Controller_Rest;
+use Fuel\Core\Response;
+use Auth\Auth;
+use Fuel\Core\DB;
+use Fuel\Core\Config;
+use Exception;
+
+class Calendar extends Controller_Rest
 {
     public function before()
     {
         parent::before();
 
-        date_default_timezone_set('Asia/Tokyo');
-
         // CORSヘッダーを設定
         header('Access-Control-Allow-Origin: http://localhost:3000');
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
         header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept');
+        header('Access-Control-Allow-Credentials: true');
         
         // preflightリクエストへの対応
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            header('HTTP/1.1 200 OK');
             exit();
         }
 
+        // ユーザーがログインしているかチェック
         if (!Auth::check()) {
-            return $this->response([
-                'status' => 'error',
-                'message' => 'Unauthorized'
-            ], 403); 
+            header('HTTP/1.1 401 Unauthorized');
+            echo json_encode(array('status' => 'error', 'message' => 'User not authenticated'));
+            exit();
         }
+
+        date_default_timezone_set('Asia/Tokyo');
     }
 
     // スケジュールの一覧を取得
     public function get_list()
     {   
         try {
-            $events = DB::select('*')->from('schedules')->execute()->as_array();
+            $user_id = Auth::instance()->get_user_id()[1];
+            $events = DB::select('*')
+                        ->from('schedules')
+                        ->where('user_id', '=', $user_id)
+                        ->execute()
+                        ->as_array();
             return $this->response(array(
                 'status' => 'success',
                 'data' => $events
@@ -61,7 +77,9 @@ class Controller_Rest_Calendar extends \Controller_Rest
         list(, $user_id) = Auth::instance()->get_user_id();
 
         try {
-            $insert = \DB::insert('schedules')
+            $inserted_rows = 0;
+
+            $inserted_rows = \DB::insert('schedules')
             ->set(array(
                 'start' => $_POST['start'],
                 'end' => $_POST['end'],
@@ -73,13 +91,11 @@ class Controller_Rest_Calendar extends \Controller_Rest
             ))
             ->execute();
 
-            error_log('Insert result: ' . $insert);
-
-            if ($insert) {
+            if ($inserted_rows > 0) {
                 return $this->response(array(
                     'status' => 'success',
                     'message' => 'Schedule added successfully.',
-                    'event' => $insert
+                    'event' => $inserted_rows
                 ));
             }
         } catch (Exception $e) {

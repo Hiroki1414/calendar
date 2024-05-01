@@ -91,7 +91,7 @@
                 <button type="submit">Login</button>
             </div>
         </form>
-        <a href="/register/index">新規登録はこちらから</a>
+        <a href="/auth/register/index">新規登録はこちらから</a>
     </div>
 </body>
 </html>

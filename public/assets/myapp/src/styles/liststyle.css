@@ -75,6 +75,13 @@ h1 {
   background-color: #c0c0c0; /* ホバー時の色を少し濃く */
 }
 
+.button-back {
+  position: fixed; 
+  right: 20px;  
+  bottom: 20px;    
+  z-index: 1000; 
+}
+
 /* Input styles for editing */
 .input {
   padding: 8px;

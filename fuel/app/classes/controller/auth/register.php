@@ -1,6 +1,15 @@
 <?php
 
-class Controller_Register extends Controller
+namespace Controller\Auth;
+
+use Fuel\Core\Controller;
+use Fuel\Core\View;
+use Fuel\Core\Response;
+use Fuel\Core\Input;
+use Fuel\Core\Session;
+use Auth;
+
+class Register extends Controller
 {
     public function action_index() {
         // 既にログインしている場合はリダイレクト
@@ -15,7 +24,7 @@ class Controller_Register extends Controller
     public function action_register() {
         if (Input::method() == 'POST') {
             $username = Input::post('username');
-            $password = Auth::hash_password(Input::post('password')); // パスワードのハッシュ化を確実に行う
+            $password = Input::post('password');
             $email = Input::post('email');
 
             // 入力バリデーション
@@ -36,7 +45,7 @@ class Controller_Register extends Controller
             } else {
                 Session::set_flash('error', '入力データが不完全です。');
             }
-            Response::redirect('register/index');
+            Response::redirect('auth/register/index');
         }
     }
 

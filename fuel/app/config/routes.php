@@ -4,8 +4,8 @@ return array(
 	'_404_'   => 'calendar/404',    // The main 404 route
 	'list' => 'calendar/list',
 	'calendar/colors' => 'calendar/colors',
-	'login' => 'login/index',
-	'login/login' => 'login/login',
-	'register' => 'register/index',
-    'register/register' => 'register/register',
+	'login' => 'auth/login/index',
+	'login/login' => 'auth/login/login',
+	'register' => 'auth/register/index',
+    'register/register' => 'auth/register/register',
 );
