@@ -20,9 +20,12 @@ class Calendar extends \Fuel\Core\Controller
         $user_id = \Auth\Auth::get_user_id()[1]; // 名前空間に注意
         \Fuel\Core\Log::debug('ログインユーザーID: ' . $user_id);
 
-        $result = \Fuel\Core\DB::select()->from('schedules')->where('user_id', '=', $user_id)->execute();
+        $schedule_data = \Model_Calendar::get_user_schedule($user_id);
 
-        \Fuel\Core\Log::debug('取得したスケジュールデータ: ', (array)$result);
+        if (!$schedule_data) {
+            \Fuel\Core\Log::error('スケジュールデータが取得できませんでした。');
+            $schedule_data = [];  // デフォルト値を設定
+        }
 
         $data = [];
         $data['title'] = 'Calendar';
@@ -34,7 +37,7 @@ class Calendar extends \Fuel\Core\Controller
         $view = \View::forge('calendar/index');
         $view->set('title', $data['title']);
         $view->set_global('data', $data);
-        $view->set('schedules', $result);
+        $view->set('schedules', $schedule_data);
 
         return $view;
     }
@@ -45,12 +48,12 @@ class Calendar extends \Fuel\Core\Controller
         $user_id = \Auth\Auth::get_user_id()[1];
 
         // ログインユーザーのスケジュールを取得
-        $result = \Fuel\Core\DB::select()->from('schedules')->where('user_id', '=', $user_id)->execute();
+        $schedule_data = \Model_Calendar::get_user_schedule($user_id);
 
         // スケジュールデータをビューに渡す
         $data = [];
         $data['title'] = 'Event List';
-        $data['schedules'] = $result;
+        $data['schedules'] = $schedule_data;
 
         // ビューを生成してデータをセットし、返す
         $view = \View::forge('calendar/list');

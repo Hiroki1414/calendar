@@ -42,11 +42,7 @@ class Calendar extends Controller_Rest
     {   
         try {
             $user_id = Auth::instance()->get_user_id()[1];
-            $events = DB::select('*')
-                        ->from('schedules')
-                        ->where('user_id', '=', $user_id)
-                        ->execute()
-                        ->as_array();
+            $events = \Model_Calendar::get_schedules_by_user($user_id);
             return $this->response(array(
                 'status' => 'success',
                 'data' => $events
@@ -72,30 +68,18 @@ class Calendar extends Controller_Rest
     // 新しいスケジュールを作成
     public function post_add()
     {
-        $currentTime = date('Y-m-d H:i:s');
+        $data = $_POST;
 
         list(, $user_id) = Auth::instance()->get_user_id();
 
         try {
-            $inserted_rows = 0;
+            $event_id = \Model_Calendar::add_schedule($data, $user_id);
 
-            $inserted_rows = \DB::insert('schedules')
-            ->set(array(
-                'start' => $_POST['start'],
-                'end' => $_POST['end'],
-                'title' => $_POST['title'],
-                'color' => $_POST['color'],
-                'created_at' => $currentTime,
-                'modified_at' => $currentTime,
-                'user_id' => $user_id
-            ))
-            ->execute();
-
-            if ($inserted_rows > 0) {
+            if ($event_id) {
                 return $this->response(array(
                     'status' => 'success',
                     'message' => 'Schedule added successfully.',
-                    'event' => $inserted_rows
+                    'event' => $$event_id
                 ));
             }
         } catch (Exception $e) {
@@ -109,8 +93,6 @@ class Calendar extends Controller_Rest
     // スケジュールを更新
     public function post_update($id)
     {
-        $currentTime = date('Y-m-d H:i:s');
-
         if (!$id) {
             Response::redirect('welcome/404');
         }
@@ -118,19 +100,10 @@ class Calendar extends Controller_Rest
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
 
-        $update = \DB::update('schedules')
-            ->set(array(
-                'start' => $data['start'],
-                'end' => $data['end'],
-                'title' => $data['title'],
-                'color' => $data['color'],
-                'modified_at' => $currentTime 
-            ))
-            ->where('schedule_id', '=', $id)
-            ->execute();
+        $update = \Model_Calendar::update_schedule($data, $id);
 
         if ($update) {
-            $updatedEvent = DB::select('*')->from('schedules')->where('schedule_id', '=', $id)->execute()->as_array();
+            $updatedEvent = \Model_Calendar::get_schedule($id);
             return $this->response(array(
                 'status' => 'success',
                 'message' => 'Event updated successfully.',
@@ -151,9 +124,7 @@ class Calendar extends Controller_Rest
             Response::redirect('404');
         }
 
-        $delete = \DB::delete('schedules')
-            ->where('schedule_id', '=', $id)
-            ->execute();
+        $delete = \Model_Calendar::delete_schedule($id);
 
         if ($delete) {
             return $this->response(array(
