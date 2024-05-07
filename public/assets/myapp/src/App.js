@@ -76,7 +76,7 @@ function App() {
       if (result.status === 'success') {
         setEvents(prevEvents => prevEvents.filter(event => event.schedule_id !== id)); // イベントリストから削除
       } else {
-        throw new Error(result.message);
+        throw new Error(result.message || 'Unknown error occurred');
       }
     } catch (error) {
       console.error("Deleting event failed:", error);

@@ -25,6 +25,10 @@ class Register extends Controller
         if (Input::method() == 'POST') {
             $username = Input::post('username');
             $password = Input::post('password');
+            if (!preg_match('/^[a-zA-Z0-9]+$/', $password)) {
+                Session::set_flash('error', 'パスワードは半角英数字のみで入力してください。');
+                Response::redirect_back();
+            }
             $email = Input::post('email');
 
             // 入力バリデーション

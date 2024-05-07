@@ -71,7 +71,7 @@ class Calendar extends Controller_Rest
         $data = $_POST;
 
         list(, $user_id) = Auth::instance()->get_user_id();
-
+        
         try {
             $event_id = \Model_Calendar::add_schedule($data, $user_id);
 
@@ -79,7 +79,7 @@ class Calendar extends Controller_Rest
                 return $this->response(array(
                     'status' => 'success',
                     'message' => 'Schedule added successfully.',
-                    'event' => $$event_id
+                    'event' => $event_id
                 ));
             }
         } catch (Exception $e) {
@@ -118,7 +118,7 @@ class Calendar extends Controller_Rest
     }
 
     // スケジュールを削除
-    public function delete_delete($id)
+    public function action_delete($id)
     {
         if (!$id) {
             return $this->response(array(
@@ -127,7 +127,8 @@ class Calendar extends Controller_Rest
             ), 400);
         }
 
-        $delete = \Model_Calendar::delete_schedule($id);
+        $current_time = date('Y-m-d H:i:s');
+        $delete = \Model_Calendar::delete_schedule($id, array('deleted_at' => $current_time));
 
         if ($delete) {
             return $this->response(array(

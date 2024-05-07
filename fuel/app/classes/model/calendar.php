@@ -7,6 +7,7 @@ class Model_Calendar extends Model
         return DB::select()
                 ->from('schedules')
                 ->where('user_id', '=', $user_id)
+                ->where('deleted_at', 'is', null)
                 ->execute();
     }
 
@@ -15,11 +16,13 @@ class Model_Calendar extends Model
         return DB::select('*')
                  ->from('schedules')
                  ->where('user_id', '=', $user_id)
+                 ->where('deleted_at', 'is', null)
                  ->execute()
                  ->as_array();
     }
 
     public static function add_schedule($data, $user_id) {
+        
         return DB::insert('schedules')
                  ->set(array(
                      'start' => $data['start'],
@@ -50,12 +53,14 @@ class Model_Calendar extends Model
         return DB::select('*')
                  ->from('schedules')
                  ->where('schedule_id', '=', $schedule_id)
+                 ->where('deleted_at', 'is', null)
                  ->execute()
                  ->as_array();
     }
 
     public static function delete_schedule($schedule_id) {
-        return DB::delete('schedules')
+        return DB::update('schedules')
+                 ->set(array('deleted_at' => date('Y-m-d H:i:s')))
                  ->where('schedule_id', '=', $schedule_id)
                  ->execute();
     }
