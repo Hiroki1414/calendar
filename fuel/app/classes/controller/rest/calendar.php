@@ -121,7 +121,10 @@ class Calendar extends Controller_Rest
     public function delete_delete($id)
     {
         if (!$id) {
-            Response::redirect('404');
+            return $this->response(array(
+                'status' => 'error',
+                'message' => 'Invalid event ID.'
+            ), 400);
         }
 
         $delete = \Model_Calendar::delete_schedule($id);

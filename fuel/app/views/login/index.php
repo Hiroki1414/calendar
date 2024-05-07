@@ -77,20 +77,23 @@
         <?php if (Session::get_flash('error')): ?>
             <p style="color:red;"><?php echo Session::get_flash('error'); ?></p>
         <?php endif; ?>
-        <form method="post" action="login/login">
+        <?php echo Form::open('auth/login/login'); ?>
             <div>
                 <label for="email">メールアドレス</label>
-                <input type="text" id="email" name="email" required>
+                <input type="email" id="email" name="email" required>
             </div>
             <div>
                 <label for="password">パスワード</label>
                 <input type="password" id="password" name="password" required>
             </div>
+            <?php 
+            $token_key = \Config::get('security.csrf_token_key');
+            $token = \Security::fetch_token();
+            echo Form::hidden($token_key, $token);
+            ?>
             <div class="spacer"></div>
-            <div>
-                <button type="submit">Login</button>
-            </div>
-        </form>
+            <button type="submit">Login</button>
+        <?php echo Form::close(); ?>
         <a href="/auth/register/index">新規登録はこちらから</a>
     </div>
 </body>

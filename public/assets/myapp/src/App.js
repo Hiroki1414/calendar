@@ -72,8 +72,12 @@ function App() {
         credentials: 'include',
       });
       if (!response.ok) throw new Error('Network response was not ok.');
-      window.location.reload()
-      setEvents(prevEvents => prevEvents.filter(event => event.schedule_id !== id)); // イベントリストから削除
+      const result = await response.json(); // サーバーからのレスポンスを取得
+      if (result.status === 'success') {
+        setEvents(prevEvents => prevEvents.filter(event => event.schedule_id !== id)); // イベントリストから削除
+      } else {
+        throw new Error(result.message);
+      }
     } catch (error) {
       console.error("Deleting event failed:", error);
     }
