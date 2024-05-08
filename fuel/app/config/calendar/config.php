@@ -6,7 +6,9 @@ return [
         'blue' => ['name' => 'blue', 'class' => 'bg-primary', 'color' => '#007BFF'],
         'light_blue' => ['name' => 'light blue', 'class' => 'bg-info', 'color' => '#5bc0de'],
         'green' => ['name' => 'green', 'class' => 'bg-success', 'color' => '#28a745'],
-        'black' => ['name' => 'black', 'class' => 'bg-dark', 'color' => '#343a40'],
+        'light_green' => ['name' => 'light green', 'class' => 'bg-lime', 'color' => '#ADFF2F'],
+        'purple' => ['name' => 'purple', 'class' => 'bg-purple', 'color' => '#800080'],
+        'pink' => ['name' => 'pink', 'class' => 'bg-pink', 'color' => '#FFC0CB'],
         'gray' => ['name' => 'gray', 'class' => 'bg-secondary', 'color' => '#6c757d']
     ]
 ];

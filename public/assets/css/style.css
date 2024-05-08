@@ -1,9 +1,44 @@
-.fc .fc-button {
-    color: white !important; /* テキストの色 */
-    background-color: #006FCE !important; /* 暗い青の背景色 */
-    border-color: #006FCE !important; /* 暗い青の境界線の色 */
+#calendar {
+    max-width: 100%; 
+    height: auto; 
+    max-height: 100vh; 
+    overflow: auto; 
 }
+
+body {
+    font-family: Arial, sans-serif; 
+    background-color: #f4f4f4; 
+    color: #4A90E2;
+}
+
+.fc .fc-toolbar-title {
+    font-size: 32px;
+    color: #4A90E2; 
+}
+
+.fc .fc-daygrid-day-number {
+    color: #4A90E2;
+}
+
+.fc .fc-button {
+    color: white !important;
+    background-color: #4A90E2 !important;
+    border-color: #4A90E2 !important;
+}
+
 .fc .fc-button:hover {
-    background-color: #0056b3 !important; /* ホバー時のさらに暗い青 */
-    border-color: #0056b3 !important; /* ホバー時のさらに暗い青の境界線色 */
+    background-color: #357ABD !important; 
+    border-color: #357ABD !important; 
+}
+
+.fc .fc-daygrid-day {
+    border: 1px solid #d3d3d3; 
+}
+
+.fc .fc-daygrid-day:nth-child(7n+1) .fc-daygrid-day-number {
+    color: #ff0000;
+}
+
+.fc .fc-col-header-cell:nth-child(1) .fc-col-header-cell-cushion {
+    color: #ff0000;
 }

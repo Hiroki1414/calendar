@@ -22,9 +22,6 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
       </div>
       <div class="modal-body">
         <form>
@@ -62,17 +59,29 @@
         };
         var calendar = new FullCalendar.Calendar(calendarEl, {
             customButtons: {
-              myCustomButton: {
-                  text: 'event',
-                  click: function() {
-                      location.href='list';
-                  }
-              }
+                myCustomButton: {
+                    text: 'events',
+                    click: function() {
+                        location.href='list';
+                    }
+                }
             },
             headerToolbar: {
                 left: 'prev,next today myCustomButton',
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            datesSet: function(dateInfo) {
+                // ヘッダーセルを赤色に設定
+                if (dateInfo.view.type === 'timeGridWeek' || dateInfo.view.type === 'timeGridDay') {
+                    var headers = document.querySelectorAll('.fc-col-header-cell');
+                    if (headers.length > 0) {
+                        headers[0].style.color = '#ff0000';  // 週ビューでの日曜日
+                        if (dateInfo.view.type === 'timeGridDay' && new Date().getDay() === 0) { // 日ビューで今日が日曜日の場合
+                            headers[0].style.color = '#ff0000';
+                        }
+                    }
+                }
             },
             events: function(fetchInfo, successCallback, failureCallback) {
                 $.ajax({
