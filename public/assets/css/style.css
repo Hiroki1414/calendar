@@ -36,9 +36,9 @@ body {
 }
 
 .fc .fc-daygrid-day:nth-child(7n+1) .fc-daygrid-day-number {
-    color: #ff0000;
+    color: #e14c4c;
 }
 
 .fc .fc-col-header-cell:nth-child(1) .fc-col-header-cell-cushion {
-    color: #ff0000;
+    color: #e14c4c;
 }
