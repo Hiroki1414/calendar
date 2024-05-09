@@ -93,7 +93,7 @@
             <div>
                 <label for="password">パスワード</label>
                 <input type="password" id="password" name="password" required minlength="8">
-                <small>パスワードは8桁以上で入力してください。</small>
+                <small>パスワードは半角英数字で8桁以上で入力してください。</small>
             </div>
             <div>
                 <button type="submit">登録</button>
