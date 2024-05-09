@@ -25,31 +25,39 @@ class Register extends Controller
         if (Input::method() == 'POST') {
             $username = Input::post('username');
             $password = Input::post('password');
-            if (!preg_match('/^[a-zA-Z0-9]+$/', $password)) {
-                Session::set_flash('error', 'パスワードは半角英数字のみで入力してください。');
-                Response::redirect_back();
-            }
             $email = Input::post('email');
 
-            // 入力バリデーション
-            if ($this->validate_input($username, $password, $email)) {
-                // Authを使用して新しいユーザーを登録
-                try {
-                    // ユーザー作成時に現在のUNIXタイムスタンプを渡す
+            if (!preg_match('/^[a-zA-Z0-9]+$/', $password)) {
+                Session::set_flash('error', 'パスワードは半角英数字のみで入力してください。');
+                Response::redirect('register');
+                return;
+            }
+
+            try {
+                if ($this->validate_input($username, $password, $email)) {
                     $user_id = Auth::create_user($username, $password, $email);
                     if ($user_id) {
-                        Session::set_flash('success', '登録が完了しました。');
-                        Response::redirect('calendar/index');
+                        Session::set_flash('success', '新規登録が完了しました');
+                        Response::redirect('login');
                     } else {
-                        throw new Exception('ユーザーの作成に失敗しました。');
+                        Session::set_flash('error', 'ユーザーの作成に失敗しました。');
+                        Response::redirect('register');
                     }
-                } catch (Exception $e) {
-                    Session::set_flash('error', $e->getMessage());
+                } else {
+                    Session::set_flash('error', '入力データが不完全です。');
+                    Response::redirect('register');
                 }
-            } else {
-                Session::set_flash('error', '入力データが不完全です。');
+            } catch (\SimpleUserUpdateException $e) {
+                // エラーコードに基づいて異なるエラーメッセージを設定
+                if ($e->getCode() == 2) {
+                    Session::set_flash('error', 'このメールアドレスはすでに存在します。');
+                } else if ($e->getCode() == 3) {
+                    Session::set_flash('error', 'このユーザー名はすでに存在します。');
+                } else {
+                    Session::set_flash('error', '不明なエラーが発生しました。');
+                }
+                Response::redirect('register');
             }
-            Response::redirect('auth/register/index');
         }
     }
 
@@ -60,3 +68,5 @@ class Register extends Controller
         return $isUsernameValid && $isPasswordValid && $isEmailValid;
     }
 }
+
+?>

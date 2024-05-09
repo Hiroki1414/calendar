@@ -62,22 +62,50 @@
         a:hover {
             text-decoration: underline;
         }
+        .notification {
+            background-color: #4CAF50; 
+            color: white;
+            padding: 20px;
+            position: fixed;
+            top: 20px; 
+            right: 20px; 
+            z-index: 1001;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 18px;
+            display: none; 
+            text-align: center;
+            opacity: 1; 
+            transition: opacity 1s ease-in-out;
+        }
     </style>
     <script>
         window.onload = function() {
-            <?php if ($message = Session::get_flash('success')): ?>
-                alert("<?php echo htmlspecialchars($message); ?>");
-            <?php endif; ?>
+            // ページロード時に通知を表示
+            var notification = document.getElementById('notification');
+            if (notification && notification.innerText.trim() !== '') {
+                notification.style.display = 'block'; // 通知を表示
+                setTimeout(function() {
+                    notification.style.opacity = '0'; 
+                    setTimeout(function() {
+                        notification.style.display = 'none'; 
+                    }, 1000);
+                }, 5000);
+            }
         };
     </script>
 </head>
 <body>
     <div class="login-container">
         <h1>Login</h1>
+        <div class="notification" id="notification" style="display: none;">
+            <?php if ($message = Session::get_flash('success')): ?>
+                <?php echo htmlspecialchars($message); ?>
+            <?php endif; ?>
+        </div>
         <?php if (Session::get_flash('error')): ?>
             <p style="color:red;"><?php echo Session::get_flash('error'); ?></p>
         <?php endif; ?>
-        <?php echo Form::open('auth/login/login'); ?>
+        <?php echo Form::open('login/login'); ?>
             <div>
                 <label for="email">メールアドレス</label>
                 <input type="email" id="email" name="email" required>
@@ -94,7 +122,7 @@
             <div class="spacer"></div>
             <button type="submit">Login</button>
         <?php echo Form::close(); ?>
-        <a href="/auth/register/index">新規登録はこちらから</a>
+        <a href="/register">新規登録はこちらから</a>
     </div>
 </body>
 </html>

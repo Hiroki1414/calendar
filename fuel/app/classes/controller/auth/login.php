@@ -37,7 +37,7 @@ class Login extends Controller
             if (!Security::check_token()) {
                 \Log::error('CSRF token validation failed.');
                 Session::set_flash('error', 'CSRF検証に失敗しました。もう一度試してください。');
-                Response::redirect('auth/login/index');
+                Response::redirect('login');
             }
 
             $email = Input::post('email');
@@ -48,15 +48,15 @@ class Login extends Controller
                 // 認証成功：ユーザーIDをセッションに保存し、リダイレクト
                 $username = Auth::get_screen_name();
                 Session::set('user_id', Auth::get_user_id()[1]);
+                Session::set_flash('success', 'ログインしました');
                 Response::redirect('calendar/index');
             } else {
-                // 認証失敗：エラーメッセージをセットし、リダイレクト
                 Session::set_flash('error', 'ログインに失敗しました。メールアドレスまたはパスワードが正しくありません。');
-                Response::redirect('auth/login/index');
+                Response::redirect('login');
             }
         } else {
             // POSTリクエストでなければログインページへリダイレクト
-            Response::redirect('auth/login/index');
+            Response::redirect('login');
         }
     }
 }

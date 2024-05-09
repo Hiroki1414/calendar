@@ -17,8 +17,8 @@
         }
         .container {
             width: 100%;
-            max-width: 350px; /* フォームの最大幅をさらに大きくする */
-            padding: 40px; /* フォームのパディングをさらに大きくする */
+            max-width: 350px; 
+            padding: 40px; 
             background: white;
             border-radius: 8px;
             box-shadow: 0 0px 10px rgba(0,0,0,0.1);
@@ -26,8 +26,8 @@
         h1 {
             text-align: center;
             color: #333;
-            font-size: 28px; /* タイトルのフォントサイズを大きくする */
-            font-weight: 700; /* タイトルのフォントを太字にする */
+            font-size: 28px; 
+            font-weight: 700; 
         }
         form {
             display: flex;
@@ -35,12 +35,12 @@
             gap: 18px;
         }
         input, button {
-            padding: 12px; /* インプットとボタンのパディングをさらに大きくする */
+            padding: 12px; 
             border: 1px solid #ccc;
             border-radius: 5px;
             width: 100%;
             box-sizing: border-box;
-            font-size: 16px; /* フォントサイズをさらに大きくする */
+            font-size: 16px; 
         }
         input:focus, button:focus {
             border-color: #5d647b;
@@ -58,17 +58,17 @@
         a {
             width: 100%;
             font-size: 16px;
-            color: #007BFF; /* リンクの色を青色に変更 */
-            text-align: center; /* リンクを中央に配置 */
+            color: #007BFF;
+            text-align: center; 
             text-decoration: none;
-            font-weight: normal; /* リンクのフォントは太字ではなくする */
+            font-weight: normal; 
         }
         a:hover {
             text-decoration: underline;
         }
         small {
             text-align: center;
-            color: red; /* エラーメッセージの色を赤にする */
+            color: red;
         }
     </style>
 </head>
@@ -98,7 +98,7 @@
             <div>
                 <button type="submit">登録</button>
             </div>
-            <a href="/auth/login/index">ログインページに戻る</a>
+            <a href="/login">ログインページに戻る</a>
         </form>
     </div>
 </body>

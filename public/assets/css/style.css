@@ -42,3 +42,18 @@ body {
 .fc .fc-col-header-cell:nth-child(1) .fc-col-header-cell-cushion {
     color: #e14c4c;
 }
+
+.notification {
+    background-color: #4CAF50; 
+    color: white;
+    padding: 15px;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    text-align: center;
+    border-radius: 5px;
+    display: none;
+    z-index: 1050;
+    opacity: 1;
+    transition: opacity 1s ease-in-out;
+}

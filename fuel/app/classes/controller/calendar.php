@@ -11,7 +11,7 @@ class Calendar extends \Fuel\Core\Controller
         // ユーザーがログインしているかチェック
         if (!\Auth\Auth::check()) {  // 名前空間に注意
             \Fuel\Core\Session::set_flash('error', 'セッションが切れました。もう一度ログインしてください。');
-            \Fuel\Core\Response::redirect('auth/login/index');
+            \Fuel\Core\Response::redirect('login');
         }
     }
 
